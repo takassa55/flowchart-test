@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>対応フローチャート選択</title>
+  <script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: false });
+
+    function showChart(type) {
+      let chartCode = '';
+
+      if (type === 'fire') {
+        chartCode = `
+graph TD
+  A[火災発生] --> B[119番通報]
+  B --> C[初期消火]
+  C --> D[避難誘導]
+  D --> E[安全確認後、被害調査]
+`;
+      } else if (type === 'rescue') {
+        chartCode = `
+graph TD
+  A[救助要請] --> B[場所と状況確認]
+  B --> C[119番通報]
+  C --> D[安全確保]
+  D --> E[人命救助実施]
+`;
+      } else if (type === 'emergency') {
+        chartCode = `
+graph TD
+  A[急病人発見] --> B[意識・呼吸確認]
+  B --> C{反応あり？}
+  C -->|あり| D[安静にして救急車要請]
+  C -->|なし| E[心肺蘇生（AED使用）]
+  D --> F[119番通報]
+  E --> F
+  F --> G[救急隊到着を待つ]
+`;
+      }
+
+      const chartDiv = document.getElementById('chart');
+      chartDiv.innerHTML = chartCode;
+      mermaid.run();
+    }
+
+    window.showChart = showChart;
+  </script>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    .buttons {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button {
+      margin: 0 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #chart {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body>
+  <h1>対応フローチャート選択</h1>
+  <div class="buttons">
+    <button onclick="showChart('fire')">火事</button>
+    <button onclick="showChart('emergency')">救急</button>
+    <button onclick="showChart('rescue')">救助</button>
+  </div>
+  <div id="chart" class="mermaid">
+    <!-- 最初は空、選択時に表示 -->
+  </div>
+</body>
+</html>
