@@ -7,44 +7,49 @@
     import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
     mermaid.initialize({ startOnLoad: false });
 
-    function showChart(type) {
+    window.showChart = async function(type) {
       let chartCode = '';
+      let chartId = 'myChart';
 
       if (type === 'fire') {
         chartCode = `
-graph TD
-  A[火災発生] --> B[119番通報]
-  B --> C[初期消火]
-  C --> D[避難誘導]
-  D --> E[安全確認後、被害調査]
-`;
+          graph TD
+            A[火災出動] --> B{炎上火災？}
+            B --> |Yes| C["<b>無線指揮</b><br>本火災は、炎上火災と思われる。<br>活動方針にあっては人命救助最優先、延焼阻止とする。<br>なお、最先着隊にあっては、〇〇と思われる。<br>〇〇は救助指定隊及び指揮代行を命ずる。"]
+            B --> |No| D["<b>無線指揮</b><br>こちらは中51、人命救助最優先、消火活動に従事せよ"]
+            C --> E[避難誘導]
+            D --> E[安全確認後、被害調査]
+        `;
       } else if (type === 'rescue') {
         chartCode = `
-graph TD
-  A[救助要請] --> B[場所と状況確認]
-  B --> C[119番通報]
-  C --> D[安全確保]
-  D --> E[人命救助実施]
-`;
+          graph TD
+            A[救助出動] --> B[場所と状況確認]
+            B --> C[119番通報]
+            C --> D[安全確保]
+            D --> E[人命救助実施]
+        `;
       } else if (type === 'emergency') {
         chartCode = `
-graph TD
-  A[急病人発見] --> B[意識・呼吸確認]
-  B --> C{反応あり？}
-  C -->|あり| D[安静にして救急車要請]
-  C -->|なし| E[心肺蘇生（AED使用）]
-  D --> F[119番通報]
-  E --> F
-  F --> G[救急隊到着を待つ]
-`;
+          graph TD
+            A[救急出動] --> B[意識・呼吸確認]
+            B --> C{反応あり？}
+            C -->|あり| D[安静にして救急車要請]
+            C -->|なし| E[心肺蘇生（AED使用）]
+            D --> F[119番通報]
+            E --> F
+            F --> G[救急隊到着を待つ]
+
+            
+
+        `;
       }
 
       const chartDiv = document.getElementById('chart');
-      chartDiv.innerHTML = chartCode;
-      mermaid.run();
-    }
+      chartDiv.innerHTML = '';
 
-    window.showChart = showChart;
+      const { svg } = await mermaid.render(chartId, chartCode);
+      chartDiv.innerHTML = svg;
+    };
   </script>
   <style>
     body {
@@ -83,12 +88,12 @@ graph TD
 <body>
   <h1>対応フローチャート選択</h1>
   <div class="buttons">
-    <button onclick="showChart('fire')">火事</button>
-    <button onclick="showChart('emergency')">救急</button>
-    <button onclick="showChart('rescue')">救助</button>
+    <button onclick="showChart('fire')">火災出動</button>
+    <button onclick="showChart('emergency')">救急出動</button>
+    <button onclick="showChart('rescue')">救助出動</button>
   </div>
-  <div id="chart" class="mermaid">
-    <!-- 最初は空、選択時に表示 -->
+  <div id="chart">
+    <!-- 初期状態では空 -->
   </div>
 </body>
 </html>
